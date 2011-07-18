@@ -1,74 +1,65 @@
 
-ARCH = $(shell uname)
+ARCH = $(shell uname )
 
-#PLUGIN = plugin
+RELEASE_DIR	=../bin
+RELEASE_OBJS= $(RELEASE_DIR)/objs
 
-RELEASE_DIR=../bin
-#RELEASE_PLUGIN_DIR=$(RELEASE_DIR)/$(PLUGIN)
-OBJS = $(RELEASE_DIR)/objs
+CC 			= gcc
+CFLAGS 		= -O2 -finline-functions
+CFLAGS 		+= -ansi -Wall -Winline
+AR 			= ar
+LIBS 		= -lm -lGL -lGLU -lglut
+INCLUDE		=I$(RELEASE_OBJS)
 
-RENDERER = pluginTest
-#RENDERER_OBJS     := $(addprefix objs/, $(RENDERER:=.o) )
-RENDERER_BINARY = $(RELEASE_DIR)/$(RENDERER)
-
-MAIN = main.c
-HEADER_FILES = plugin.h
-#CORE_HEADERS= $(addprefix core/, $(CORE_HEADERFILES)) 
-
-#PLUGIN_FILES = camera light
-#PLUGINS:= $(addprefix $(OBJS)/, $(PLUGIN_FILES:=.o))
-#PLUGIN_DSOS:= $(addprefix $(RELEASE_PLUGIN_DIR)/, $(PLUGIN_FILES:=.so))
-
-LIB_FILES = buf
-LIBS = $(addprefix $(OBJS)/, $(LIB_FILES:=.o))
-LIBS_DSO=$(addprefix $(OBJS)/, $(LIB_FILES:=.so))
-
-
-CC = gcc
-INCLUDE=-I.
-LD=$(CC) $(OPT)
-DEFS=-DNDEBUG
-OPT=-O2 -msse2 -mfpmath=sse
-WARN=-Wall
-CWD=$(shell pwd)
-CXXFLAGS=$(OPT) $(INCLUDE) $(WARN) $(DEFS)
-CCFLAGS=$(CXXFLAGS)
-
-ifeq ($(ARCH), Darwin)
-  OS_VERSION = $(shell uname -r)
-  SHARED_LDFLAGS = -flat_namespace -undefined suppress -bundle 
-  LRT_LDFLAGS=$(OPT)
-  INCLUDE += -I/sw/include
-  #WARN += -Wno-long-double
+ifeq ($(ARCH),Cygwin)
+	LIBS = -lm -lopengl32 -lglu32 -lglut32
+	LDFLAGS += -static-libgcc
 endif
 
-all: dir  $(RENDERER_BINARY)
+# For debugging, uncomment the next one
+#
+# CFLAGS += -O0 -DDEBUG -g3 -gdwarf-2
+
+###############
+# Pretty print
+###############
+V	      = @
+Q	      = $(V:1=)
+QUIET_CC      = $(Q:@=@echo    '     CC       '$@;)
+QUIET_AR      = $(Q:@=@echo    '     AR       '$@;)
+QUIET_GEN     = $(Q:@=@echo    '     GEN      '$@;)
+QUIET_LINK    = $(Q:@=@echo    '     LINK     '$@;)
+
+
+EXECUTABLE = equinox
+EXECUTABLE_BINARY = $(RELEASE_DIR)/$(EXECUTABLE)
+
+MAIN = main.c
+HEADER_FILES = EtTypes.h
+
+LIB_FILES	= buf EtParam EtNode
+LIB_HEADERS	= $(LIB_FILES:=.h)
+LIB_OBJS	= $(addprefix $(RELEASE_OBJS)/, $(LIB_FILES:=.o))
+LIB_FILE	= $(RELEASE_OBJS)/equinox.a
+
+
+all: dir  $(EXECUTABLE_BINARY)
 
 dir:
-	@echo '#######################'
-	@echo 'Making Output Dirs'
-	mkdir -p $(RELEASE_DIR)
-	#mkdir -p $(RELEASE_PLUGIN_DIR)
-	mkdir -p $(OBJS)
+	@mkdir -p $(RELEASE_DIR)
+	@mkdir -p $(RELEASE_OBJS)
 
-$(OBJS)/%.o: $(PLUGIN)/%.c 
-	@echo '#######################'
-	@echo "MAKING $@"
-	$(CC) -c $(INCLUDE) -o $@ $<
 
-$(RELEASE_PLUGIN_DIR)/%.so: $(OBJS)/%.o 
-	$(LD) $(SHARED_LDFLAGS) $^ -o $@
+$(RELEASE_OBJS)/%.o: %.c $(LIB_HEADERS) $(HEADER_FILES) 
+	@echo "// MAKING $@"
+	$(CC) -c  -o $@ $<
 
-$(OBJS)/%.o: %.c %.h 
-	@echo '#######################'
-	@echo "MAKING $@"
-	$(CC) -c $(INCLUDE) -o $@ $<
+$(LIB_FILE): $(LIB_OBJS)
+	$(QUIET_AR)$(AR) rcs $@ $(LIB_OBJS)
 
-$(OBJS)/%.so: $(OBJS)/%.o 
-	$(LD) $(SHARED_LDFLAGS) $^ -o $@
+$(EXECUTABLE_BINARY): $(MAIN) $(LIB_FILE) $(HEADER_FILES) 
+	@echo 'Making $(EXECUTABLE)'
+	$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
 
-$(RENDERER_BINARY): $(MAIN) $(HEADER_FILES) $(LIBS_DSO)
-	@echo '#######################'
-	@echo 'Making $< Binary'
-	$(CC) $(INCLUDE) -I$(OBJS) -o $@ $<
-	
+clean:
+	rm -vfr $(RELEASE_DIR)	

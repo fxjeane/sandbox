@@ -13,14 +13,14 @@
 #include "EtParam.h"
 
 struct EtNode {
-	const char 	*name;
+	const EtChar 	*name;
 	EtParamDef 	*params;
 	EtParamData	*paramData;
 };
 typedef struct EtNode EtNode;
 
 // Node creator
-EtNode EiNode(const char *name);
+EtNode EiNode(const EtChar *name);
 // Add parameter to a node
 void EiNodeAddParam(const EtNode *node, const EtParamDef parm);
 
@@ -28,11 +28,11 @@ void EiNodeAddParam(const EtNode *node, const EtParamDef parm);
 // Get number of params on a node
 int EiNodeGetNumParams(const EtNode *node);
 // Get an integer parameter
-int EiNodeGetInt(const EtNode *node,const char *name);
+int EiNodeGetInt(const EtNode *node,const EtChar *name);
 
 
 /********* Setters ***********/
 // Set integer parameter
-void EiNodeSetInt(EtNode *node,const char *name,const int val);
+void EiNodeSetInt(EtNode *node,const EtChar *name,const EtInt val);
 
 #endif  //ETNODE_H

@@ -2,19 +2,30 @@
 #ifndef ETPARAM_H
 #define ETPARAM_H
 
-//#include "buf.h"
 #include "EtTypes.h"
 
 union EtParamValue {
-	int		intVal;
-	double	dblVal;
+	EtByte     		BYTE;
+	EtInt      		INT;
+	EtUInt     		UINT;
+	EtBoolean  		BOOL;
+	EtFloat    		FLT;
+//	EtRGB      		RGB;
+//	EtRGBA     		RGBA;
+//	EtVector   		VEC;
+//	EtPoint    		PNT;
+//	EtPoint2   		PNT2;
+	const EtChar	*STR;
+	EtVoid     		*PTR;
+//	EtArray    		*ARRAY;
+//	EtMatrix   		*pMTX;
 };
 typedef union EtParamValue EtParamValue;
 
 struct EtParamDef {
-	const char 		*name;
-	int 			type;
-	EtParamValue	defVal;
+	const EtChar 		*name;
+	EtInt 				type;
+	EtParamValue		defVal;
 };
 typedef struct EtParamDef EtParamDef;
 
@@ -23,8 +34,8 @@ struct EtParamData {
 };
 typedef struct EtParamData EtParamData;
 
-int EiGetParamDefSize(const EtParamDef param);
+EtInt EiGetParamDefSize(const EtParamDef param);
 
-EtParamDef EiParamDefInt(const char *name,const int def);
+EtParamDef EiParamDefInt(const EtChar *name,const EtInt def);
 
 #endif // ETPARAM_H

@@ -1,7 +1,8 @@
 
 #include "EtNode.h"
+#include <stdio.h>
 
-EtNode EiNode(const char *name) {
+EtNode EiNode(const EtChar *name) {
 	EtNode temp;
 	temp.name 		= name;
 	temp.params 	= NULL;
@@ -13,7 +14,7 @@ void EiNodeAddParam(const EtNode *node, const EtParamDef parm) {
 	buf_push(node->params,parm);
 	switch ( parm.type ) {
 		case EI_TYPE_INT: {
-			EtParamValue bar = {parm.defVal.intVal};
+			EtParamValue bar = {parm.defVal.INT};
 			EtParamData data;
 			data.val = bar;
 			buf_push(node->paramData,data);
@@ -32,34 +33,36 @@ int EiNodeGetNumParams(const EtNode *node) {
 /***********
  * gets a EtParamData from a given name
  ***********/
-void* EiNodeGetParam(const EtNode *node, const char *name) {
+void* EiNodeGetParam(const EtNode *node, const EtChar *name) {
 	EtParamDef *params = node->params;
 	EtParamData *paramData = node->paramData;
-	int offset = 0;
+	EtInt offset = 0;
 	// to get the value first look for the name in the params array. 
 	// use that index
-	int i = 0;
-	for (i; i < buf_len(params); ++i) {
+	EtInt i = 0;
+	for (i; i < buf_len(params); i++) {
 		offset = i * EiGetParamDefSize(params[i]);
+		//printf("name=%s, i=%d, offset=%d\n",params[i].name,i,offset);
 		if (strcmp(params[i].name,name) == 0) {
-			return &paramData[i];
+			return &paramData[offset];
 		}
 	}
 	return NULL;
 }
 
-int EiNodeGetInt(const EtNode *node,const char *name)
+int EiNodeGetInt(const EtNode *node,const EtChar *name)
 {
 	EtParamData *param = EiNodeGetParam(node,name);
 	if (param)
-		return param->val.intVal;
+		return param->val.INT;
 	else
 		return -1;
 }
 
 /*********** Setters ***************/
-void EiNodeSetInt(EtNode *node,const char *name,const int val) {
+void EiNodeSetInt(EtNode *node,const EtChar *name,const EtInt val) {
 	EtParamData *param = EiNodeGetParam(node,name);
 	EtParamValue bar = {val};
 	param->val = bar;
 }
+

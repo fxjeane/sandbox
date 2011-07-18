@@ -1,107 +1,74 @@
-#include "buf.h"
-#include <string.h>
 
-#define EI_TYPE_INT         0x01  
-#define EI_TYPE_DOUBLE		0x02 
+#ifndef EITYPES_H
+#define EITYPES_H
 
-/****************************
- * Params
- ***************************/
-union EtParamValue {
-	int		intVal;
-	double	dblVal;
-};
-typedef union EtParamValue EtParamValue;
+#define EI_TYPE_BYTE        	0x00  
+#define EI_TYPE_INT				0x01  
+#define EI_TYPE_UINT            0x02  
+#define EI_TYPE_BOOLEAN       	0x03  
+#define EI_TYPE_FLOAT           0x04  
+#define EI_TYPE_RGB         	0x05  
+#define EI_TYPE_RGBA        	0x06  
+#define EI_TYPE_VECTOR       	0x07  
+#define EI_TYPE_POINT         	0x08  
+#define EI_TYPE_POINT2       	0x09  
+#define EI_TYPE_STRING        	0x0A  
+#define EI_TYPE_POINTER     	0x0B  
+#define EI_TYPE_NODE          	0x0C  
+#define EI_TYPE_ARRAY         	0x0D  
+#define EI_TYPE_MATRIX        	0x0E  
+#define EI_TYPE_ENUM         	0x0F  
+#define EI_TYPE_UNDEFINED     	0xFF  
+#define EI_TYPE_NONE         	0xFF 
 
-struct EtParamDef {
-	const char 		*name;
-	int 			type;
-	EtParamValue	defVal;
-};
-typedef struct EtParamDef EtParamDef;
 
-struct EtParamData {
-	EtParamValue	val;
-};
-typedef struct EtParamData EtParamData;
+/*
+ * NULL value for null pointers
+ */
+#ifndef NULL
+#define NULL 0x00000000
+#endif
 
-int EiGetParamDefSize(const EtParamDef param) {
-	switch(param.type) {
-		case EI_TYPE_INT:
-			return sizeof(int);
-		case EI_TYPE_DOUBLE:
-			return sizeof(double);
-		default:
-			return -1;
-	}
-}
 
-/****************************
- * Node - Base
- ***************************/
-struct EtNode {
-	const char 	*name;
-	EtParamDef 	*params;
-	EtParamData	*paramData;
-};
-typedef struct EtNode EtNode;
+/****************************************************************************
+   Basic data types
+****************************************************************************/
 
-EtParamDef EiParamDefInt(const char *name,const int def) {
-	EtParamDef temp;
-	EtParamValue bar = {def};
-	
-	temp.name = name;
-	temp.type = EI_TYPE_INT;
-	temp.defVal = bar;
+typedef void               EtVoid;
+typedef char               EtChar;
+typedef char               EtBoolean;
+#define TRUE 1
+#define FALSE 0
 
-	return temp;
-}
+typedef unsigned short     EtUShort;
+typedef short              EtShort;
+typedef unsigned long      EtULong;
+typedef long               EtLong;
 
-EtNode EiNode(const char *name) {
-	EtNode temp;
-	temp.name 		= name;
-	temp.params 	= NULL;
-	temp.paramData 	= NULL;
-	return temp;
-}
+typedef signed long long   EtLLong;
+typedef unsigned long long EtULLong;
+#define AI_LLONG(x) x##ll
+#define AI_ULLONG(x) x##ull
 
-void EiNodeAddParam(const EtNode *node, const EtParamDef parm) {
-	buf_push(node->params,parm);
-	switch ( parm.type ) {
-		case EI_TYPE_INT: {
-			EtParamValue bar = {parm.defVal.intVal};
-			EtParamData data;
-			data.val = bar;
-			buf_push(node->paramData,data);
-			break;
-		}
-		default:
-			break;
-	}
-}
+typedef int                EtInt;
+typedef unsigned int       EtUInt;
 
-int EiNodeGetNumParams(const EtNode *node) {
-	return buf_len(node->params);	
-}
+typedef char               EtInt8;
+typedef short              EtInt16;
+typedef int                EtInt32;
+typedef EtLLong            EtInt64;
+typedef unsigned char      EtUInt8;
+typedef unsigned short     EtUInt16;
+typedef unsigned int       EtUInt32;
+typedef EtULLong           EtUInt64;
 
-int EiNodeGetInt(const EtNode *node,const char *name)
-{
-	EtParamDef *params = node->params;
-	EtParamData *paramData = node->paramData;
+typedef unsigned char      EtByte;
 
-	int offset = 0;
-	
-	// to get the value first look for the name in the params array. 
-	// use that index
-	int i = 0;
-	for (i; i < buf_len(params); ++i) {
-		if (strcmp(params[i].name,name) == 0) {
-			offset = (i * EiGetParamDefSize(params[i]));
-			return (int) paramData[i].val.intVal;
-		} else {
-			offset = i * EiGetParamDefSize(params[i]);
-		}
-	}
-	return -1;
-}
+typedef float              EtFloat;
+typedef double             EtDouble;
+
+typedef const EtChar*      EtConstCharPtr;
+typedef EtVoid*            EtVoidPtr;
+
+#endif
 
