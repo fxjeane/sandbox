@@ -22,20 +22,20 @@ union EtParamValue {
 };
 typedef union EtParamValue EtParamValue;
 
-struct EtParamDef {
+struct EtParam {
 	const EtChar 		*name;
 	EtInt 				type;
-	EtParamValue		defVal;
+	EtParamValue		def;
+	EtParamValue		val;
 };
-typedef struct EtParamDef EtParamDef;
+typedef struct EtParam EtParam;
 
-struct EtParamData {
-	EtParamValue	val;
-};
-typedef struct EtParamData EtParamData;
 
-EtInt EiGetParamDefSize(const EtParamDef param);
+EtInt EiGetParamSize(const EtParam param);
 
-EtParamDef EiParamDefInt(const EtChar *name,const EtInt def);
+EtParam EiParamInt(const EtChar *name,const EtInt def);
+EtParam EiParamFlt(const EtChar *name,const EtFloat def);
+EtParam EiParamBool(const EtChar *name,const EtBoolean def);
+
 
 #endif // ETPARAM_H
