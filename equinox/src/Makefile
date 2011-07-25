@@ -1,8 +1,9 @@
 
 ARCH = $(shell uname )
 
-RELEASE_DIR	=../bin
-RELEASE_OBJS= $(RELEASE_DIR)/objs
+RELEASE_DIR			= ../bin
+RELEASE_OBJS		= $(RELEASE_DIR)/objs
+UTEST_RELEASE_DIR	= $(RELEASE_DIR)/utests
 
 CC 			= gcc
 CFLAGS 		= -O2 -finline-functions
@@ -23,32 +24,44 @@ endif
 ###############
 # Pretty print
 ###############
-V	      = @
-Q	      = $(V:1=)
+V		      = @
+Q		      = $(V:1=)
 QUIET_CC      = $(Q:@=@echo    '     CC       '$@;)
 QUIET_AR      = $(Q:@=@echo    '     AR       '$@;)
 QUIET_GEN     = $(Q:@=@echo    '     GEN      '$@;)
 QUIET_LINK    = $(Q:@=@echo    '     LINK     '$@;)
 
 
-EXECUTABLE = equinox
-EXECUTABLE_BINARY = $(RELEASE_DIR)/$(EXECUTABLE)
+EXECUTABLE 			= equinox
+EXECUTABLE_BINARY	= $(RELEASE_DIR)/$(EXECUTABLE)
 
-MAIN = main.c
-HEADER_FILES = EtTypes.h
+UTESTS				= EtParamUTest
+UTESTS_FILES		= $(UTESTS:=.c)
+UTESTS_EXECS		= $(addprefix $(UTEST_RELEASE_DIR)/, $(UTESTS))
 
-LIB_FILES	= buf EtParam EtNode
-LIB_HEADERS	= $(LIB_FILES:=.h)
-LIB_OBJS	= $(addprefix $(RELEASE_OBJS)/, $(LIB_FILES:=.o))
-LIB_FILE	= $(RELEASE_OBJS)/equinox.a
+MAIN 				= main.c
+HEADER_FILES 		= EtTypes.h
+
+LIB_FILES			= buf EtParam EtNode
+LIB_HEADERS			= $(LIB_FILES:=.h)
+LIB_OBJS			= $(addprefix $(RELEASE_OBJS)/, $(LIB_FILES:=.o))
+LIB_FILE			= $(RELEASE_OBJS)/equinox.a
 
 
-all: dir  $(EXECUTABLE_BINARY)
+all: dir utests  $(EXECUTABLE_BINARY)
 
 dir:
 	@mkdir -p $(RELEASE_DIR)
 	@mkdir -p $(RELEASE_OBJS)
+	@mkdir -p $(UTEST_RELEASE_DIR)
 
+utests: dir $(UTESTS_EXECS)
+	@echo "UNIT TESTS Done!!"
+	
+$(UTEST_RELEASE_DIR)/%: $(UTESTS_FILES) $(LIB_FILE)
+	@echo 'Making utest $<'
+	$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
+	
 
 $(RELEASE_OBJS)/%.o: %.c $(LIB_HEADERS) $(HEADER_FILES) 
 	@echo "// MAKING $@"
@@ -58,7 +71,7 @@ $(LIB_FILE): $(LIB_OBJS)
 	$(QUIET_AR)$(AR) rcs $@ $(LIB_OBJS)
 
 $(EXECUTABLE_BINARY): $(MAIN) $(LIB_FILE) $(HEADER_FILES) 
-	@echo 'Making $(EXECUTABLE)'
+	@echo 'Making --- $(EXECUTABLE)'
 	$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
 
 clean:

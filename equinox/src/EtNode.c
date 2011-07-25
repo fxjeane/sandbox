@@ -30,23 +30,13 @@ int EiNodeGetNumParams(const EtNode *node) {
 /***********
  * Gets a EtParamData from a given name
  ***********/
-// Int
-EtInt EiNodeGetInt(const EtNode *node,const EtChar *name)
+// Byte
+EtByte EiNodeGetByte(const EtNode *node,const EtChar *name)
 {
 	EtParam *param = EiNodeGetParam(node,name);
-	if (param)
-		return param->val.INT;
-	//else
-	//	return NULL;
-}
-// Float
-EtFloat EiNodeGetFlt(const EtNode *node,const EtChar *name)
-{
-	EtParam *param = EiNodeGetParam(node,name);
-	if (param)
-		return param->val.FLT;
-	//else
-	//	return NULL;
+	if (param) {
+		return param->val.BYTE;
+	}
 }
 // Boolean
 EtBoolean EiNodeGetBool(const EtNode *node,const EtChar *name)
@@ -54,22 +44,56 @@ EtBoolean EiNodeGetBool(const EtNode *node,const EtChar *name)
 	EtParam *param = EiNodeGetParam(node,name);
 	if (param)
 		return param->val.BOOL;
-	//else
-	//	return NULL;
 }
+// Int
+EtInt EiNodeGetInt(const EtNode *node,const EtChar *name)
+{
+	EtParam *param = EiNodeGetParam(node,name);
+	if (param)
+		return param->val.INT;
+}
+// UInt
+EtUInt EiNodeGetUInt(const EtNode *node,const EtChar *name)
+{
+	EtParam *param = EiNodeGetParam(node,name);
+	if (param)
+		return param->val.UINT;
+}
+// Float
+EtFloat EiNodeGetFlt(const EtNode *node,const EtChar *name)
+{
+	EtParam *param = EiNodeGetParam(node,name);
+	if (param)
+		return param->val.FLT;
+}
+
+
 /*********** Setters ***************/
+// Byte
+void EiNodeSetByte(EtNode *node,const EtChar *name,const EtByte val) {
+	EtParam *param = EiNodeGetParam(node, name);
+	if (param)
+		param->val.BYTE = val;
+}
+// Boolean
 void EiNodeSetBool(EtNode *node,const EtChar *name,const EtBoolean val) {
 	EtParam *param = EiNodeGetParam(node, name);
 	if (param)
 		param->val.BOOL = val;
 }
-
+// Int
 void EiNodeSetInt(EtNode *node,const EtChar *name,const EtInt val) {
 	EtParam *param = EiNodeGetParam(node, name);
 	if (param)
 		param->val.INT = val;
 }
-
+// UInt
+void EiNodeSetUInt(EtNode *node,const EtChar *name,const EtUInt val) {
+	EtParam *param = EiNodeGetParam(node, name);
+	if (param)
+		param->val.UINT = val;
+}
+// Float
 void EiNodeSetFlt(EtNode *node,const EtChar *name,const EtFloat val) {
 	EtParam *param = EiNodeGetParam(node, name);
 	if (param)
@@ -85,9 +109,11 @@ void* EiNodeGetParam(const EtNode *node, const EtChar *name) {
 	
 	for (i ; i < buf_len(params); i++) {
 		if (strcmp(params[i].name,name) == 0) {
+			//printf("FOUND %s\n",name);
 			return &params[i];
 		}
 	}
+	//printf("NOT FOUND %s\n",name);
 	return NULL;
 }
 
