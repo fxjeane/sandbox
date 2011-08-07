@@ -1,6 +1,6 @@
 
-#include "EtNode.h"
 #include <stdio.h>
+#include "EtNode.h"
 
 /********* Prototypes for private funtions *********/
 void EiNodePrintNode(const EtNode *node);
@@ -12,6 +12,17 @@ void* EiNodeGetParam(const EtNode *node, const EtChar *name);
  ********* Public Functions ***********
  *************************************/
 EtNode EiNode(const EtChar *name) {
+	EtPlugin *plugin = EiGetPlugin(name);
+	//printf("creating instance of %s\n",plugin->name);
+	plugin->mtds->dmethods->init();
+	switch (plugin->pluginType) {
+		case EI_PLUGIN_CAMERA : { 
+			EtCameraMethods *cm = (EtCameraMethods *) plugin->mtds->umethods; 
+			cm->createRay();
+			break;
+			}
+	}
+
 	EtNode temp;
 	temp.name 			= name;
 	temp.params 		= NULL;

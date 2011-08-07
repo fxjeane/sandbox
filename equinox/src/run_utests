@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+for f in ../bin/utests/*;
+do 
+echo "Processing $f file.."; 
+$f
+done

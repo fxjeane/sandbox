@@ -5,15 +5,18 @@
  *
  ************************************************/
 
-#ifndef	ETNODE_H
-#define ETNODE_H
+#ifndef	ET_NODE_H
+#define ET_NODE_H
 
 #include "buf.h"
 #include "EtTypes.h"
 #include "EtParam.h"
+#include "EtPluginManager.h"
+#include "EtCamera.h"
 
 struct EtNode {
 	const EtChar 		*name;
+	const char			*type;
 	EtParam 			*params;
 };
 typedef struct EtNode EtNode;

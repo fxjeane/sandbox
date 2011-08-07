@@ -22,6 +22,7 @@
 #define EI_TYPE_NONE         	0xFF 
 
 
+#define EI_PLUGIN_CAMERA       	0x00  
 /*
  * NULL value for null pointers
  */
