@@ -1,4 +1,3 @@
-
 ARCH = $(shell uname )
 
 RELEASE_DIR			= ../bin
@@ -8,17 +7,13 @@ PLUGIN_DIR			= plugin
 PLUGIN_RELEASE_DIR = $(RELEASE_DIR)/$(PLUGIN_DIR)
 
 CC 			= gcc
+CPP			= g++
 CFLAGS 		= -O2 -finline-functions
 CFLAGS 		+= -ansi -Wall -Winline
 AR 			= ar
-LIBS 		= -lm -lGL -lGLU -lglut
-INCLUDE		=-I. #-I$(RELEASE_OBJS)
+LIBS 		= -lm -lIlmImf -lHalf
+INCLUDE		=-I. -I/usr/local/include/OpenEXR
 SHARED_LDFLAGS = -flat_namespace -undefined suppress -bundle
-
-ifeq ($(ARCH),Cygwin)
-	LIBS = -lm -lopengl32 -lglu32 -lglut32
-	LDFLAGS += -static-libgcc
-endif
 
 # For debugging, uncomment the next one
 #
@@ -45,7 +40,7 @@ UTESTS_EXECS		= $(addprefix $(UTEST_RELEASE_DIR)/, $(UTESTS))
 MAIN 				= main.c
 HEADER_FILES 		= EtTypes.h
 
-LIB_FILES			= buf EtParam EtNode EtPluginManager EtGeometry EtBucket
+LIB_FILES			= buf EtParam EtNode EtPluginManager EtGeometry EtBucket exr
 LIB_HEADERS			= $(LIB_FILES:=.h)
 LIB_OBJS			= $(addprefix $(RELEASE_OBJS)/, $(LIB_FILES:=.o))
 LIB_FILE			= $(RELEASE_OBJS)/equinox.a
@@ -70,24 +65,27 @@ run_utests:
 
 $(UTEST_RELEASE_DIR)/%: $(UTESTS_FILES) $(LIB_FILE)
 	@echo 'Making utest $<'
-	$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
-	
+	#$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
 
 $(RELEASE_OBJS)/%.o: %.c $(LIB_HEADERS) $(HEADER_FILES) 
 	@echo "// MAKING $@"
 	$(CC) -c  -o $@ $<
 
-$(PLUGIN_RELEASE_DIR)/%.so: $(PLUGIN_DIR)/%.c $(LIB_FILE) #$(PLUGIN_HEADERS) $(HEADER_FILES) 
+$(RELEASE_OBJS)/%.o: %.cpp $(LIB_HEADERS) $(HEADER_FILES) 
+	@echo "// MAKING $@"
+	$(CPP)  -c $(INCLUDE) -DCPLUSPLUS -o $@ $<
+
+$(PLUGIN_RELEASE_DIR)/%.so: $(PLUGIN_DIR)/%.c $(LIB_FILE) 
 	@echo "// MAKING PLUGIN $@"
 	$(QUIET_LINK) $(CC) $(INCLUDE)  $(SHARED_LDFLAGS) -o $@ $< $(LIB_FILE)
-#	$(CC) -c  $(INCLUDE) $(LDFLAGS) -o $@ $<
 
 $(LIB_FILE): $(LIB_OBJS)
 	$(QUIET_AR)$(AR) rcs $@ $(LIB_OBJS)
 
 $(EXECUTABLE_BINARY): $(MAIN) $(LIB_FILE) $(HEADER_FILES) 
 	@echo 'Making --- $(EXECUTABLE)'
-	$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
-
+	$(QUIET_LINK) $(CPP) $(LDFLAGS) $(LIBS) $(INCLUDE)  -DCPLUSPLUS -o $@ $< $(LIB_FILE)
+	../bin/equinox
+	open test.exr
 clean:
 	rm -vfr $(RELEASE_DIR)	

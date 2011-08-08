@@ -1,7 +1,7 @@
 #include "EtPluginManager.h"
 
 
-int EiLoadPlugin(const char *lib) {
+ET_API int EiLoadPlugin(const char *lib) {
     void 		*handle;
 	int 		*pluginType;
     //char		*name;

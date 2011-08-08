@@ -6,6 +6,7 @@
 #include <strings.h>
 #include "buf.h"
 #include "EtTypes.h"
+#include "EtApi.h"
 
 struct EtNodeDefaultMtds {
 	 void (* init)(void);
@@ -36,8 +37,8 @@ struct EtPluginRegistry {
 #define plugin_loader bool load(int i, EtPlugin *plugin)
 #define plugin_init void init(void)
 
-int EiLoadPlugin(const char *lib);
-int EiLoadPlugins();
-void* EiGetPlugin(const char *name);
+ET_API int EiLoadPlugin(const char *lib);
+ET_API int EiLoadPlugins(const char *dir);
+ET_API void* EiGetPlugin(const char *name);
 
 #endif //ET_PLUGIN_MANAGER_H

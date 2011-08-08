@@ -8,6 +8,7 @@
 #ifndef	ET_NODE_H
 #define ET_NODE_H
 
+#include "EtApi.h"
 #include "buf.h"
 #include "EtTypes.h"
 #include "EtParam.h"
@@ -22,7 +23,7 @@ struct EtNode {
 typedef struct EtNode EtNode;
 
 // Node creator
-EtNode EiNode(const EtChar *name);
+ET_API EtNode EiNode(const EtChar *name);
 // Add parameter to a node
 void EiNodeAddParam(EtNode *node, const EtParam parm);
 

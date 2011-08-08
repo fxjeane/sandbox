@@ -1,6 +1,7 @@
 #ifndef ET_BUCKET_H
 #define ET_BUCKET_H
-#include "equinox.h"
+#include "EtGeometry.h"
+#include "exr.h"
 
 struct EtBucket {
 	EtPoint2	pos;
@@ -10,12 +11,12 @@ struct EtBucket {
 typedef struct EtBucket EtBucket;
 
 struct EtBucketWorker {
-	EtBucket	*buckets;
-	int			x;
-	int			y;
+	EtBucket			*buckets;
+	unsigned int	num;
 };
 typedef struct EtBucketWorker EtBucketWorker;
 
-void CalculateBuckets(EtBucketWorker*,const int, const int, const int);
+ET_API void EiCalculateBuckets(EtBucketWorker*,const int, const int, const int);
+ET_API void EiProcessBucket(const EtBucket,Rgba**);
 
 #endif // ET_BUCKET_H
