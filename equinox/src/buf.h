@@ -6,12 +6,15 @@
 /* Based on Sean Barrett's stretchy buffer at http://www.nothings.org/stb/stretchy_buffer.txt
  * init: NULL, free: buf_free(), push_back: buf_push(), size: buf_len()
  */
-#define buf_len(a)		((a) ? buf_n_(a) : 0)
-#define buf_push(a, v)		(buf_maybegrow1_(a), (a)[buf_n_(a)++] = (v))
-#define buf_resize(a, n)	(buf_maybegrow_(a, n), (a) ? buf_n_(a) = (n) : 0)
-#define buf_reserve(a, n)	(buf_maybegrow_(a, n))
+#define buf_len(a)		     ((a) ? buf_n_(a) : 0)
+#define buf_push(a, v)		 (buf_maybegrow1_(a), (a)[buf_n_(a)++] = (v))
+#define buf_resize(a, n)	 (buf_maybegrow_(a, n), (a) ? buf_n_(a) = (n) : 0)
+#define buf_reserve(a, n)	 (buf_maybegrow_(a, n))
 #define buf_free(a)		((a) ? free(buf_raw_(a)) : (void) 0)
 #define buf_foreach(it, a)	for ((it) = (a); (it) < (a) + buf_len(a); (it)++)
+//#define buf_foreach_dec(it, a, o )	for ((it) = buf_len(a) - 1; (it) > (o);--(it))
+
+//#define buf_insert(it,a, v , o)  buf_resize(a,buf_len(a)); buf_foreach_dec((it),(a),(o)) { (a)[it] = (a)[it-1];} (a)[o] = (v)
 
 /* Private */
 #define buf_raw_(a)		((int *) (a) - 2)

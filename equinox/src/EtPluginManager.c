@@ -56,6 +56,7 @@ int EiLoadPlugins(const char *directory) {
 
 void* EiGetPlugin(const char *name) {
 	EtInt i = 0;
+	// get the plugin from the registry
 	for (i ; i < buf_len(EtPluginRegistry.names); i++) {
 		if (strcmp(EtPluginRegistry.names[i],name) == 0) {
 			return &EtPluginRegistry.plugins[i];

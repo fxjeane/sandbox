@@ -65,7 +65,7 @@ run_utests:
 
 $(UTEST_RELEASE_DIR)/%: $(UTESTS_FILES) $(LIB_FILE)
 	@echo 'Making utest $<'
-	#$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
+#	$(QUIET_LINK) $(CC) $(LDFLAGS)  -o $@ $< $(LIB_FILE)
 
 $(RELEASE_OBJS)/%.o: %.c $(LIB_HEADERS) $(HEADER_FILES) 
 	@echo "// MAKING $@"
@@ -85,7 +85,7 @@ $(LIB_FILE): $(LIB_OBJS)
 $(EXECUTABLE_BINARY): $(MAIN) $(LIB_FILE) $(HEADER_FILES) 
 	@echo 'Making --- $(EXECUTABLE)'
 	$(QUIET_LINK) $(CPP) $(LDFLAGS) $(LIBS) $(INCLUDE)  -DCPLUSPLUS -o $@ $< $(LIB_FILE)
-	../bin/equinox
-	open test.exr
+#	../bin/equinox
+#	open test.exr
 clean:
 	rm -vfr $(RELEASE_DIR)	

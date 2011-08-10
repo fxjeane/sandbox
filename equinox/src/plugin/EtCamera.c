@@ -1,15 +1,22 @@
 #include "EtCamera.h"
 
-//EtNodeMtds *mtds = (EtNodeMtds *) malloc(sizeof(EtNodeMtds));
-plugin_init {
-	printf("ran init\n");
+plugin_params {
+	printf("Added Parameters\n");
+	EiNodeParamPoint(&node->params,"position",0,0,0);
+	EiNodeParamPoint(&node->params,"lookAt",0,1,0);
 };
+
+plugin_init {
+	printf("camera initialized\n");
+};
+
 camera_create_ray {
 	printf("rays created bitch!\n");
 };
 
 static EtNodeDefaultMtds defmtds = {
-	&init
+	&init,
+	&setParams
 };
 static EtCameraMethods cammtds = {
 	&createRay

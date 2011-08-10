@@ -1,3 +1,4 @@
+
 #ifndef ET_BUCKET_H
 #define ET_BUCKET_H
 #include "EtGeometry.h"
@@ -17,6 +18,6 @@ struct EtBucketWorker {
 typedef struct EtBucketWorker EtBucketWorker;
 
 ET_API void EiCalculateBuckets(EtBucketWorker*,const int, const int, const int);
-ET_API void EiProcessBucket(const EtBucket,Rgba**);
+ET_API void EiProcessBucket(const EtBucket,Rgba*,int &iterator);
 
 #endif // ET_BUCKET_H

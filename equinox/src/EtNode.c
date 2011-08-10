@@ -1,6 +1,9 @@
 
 #include <stdio.h>
 #include "EtNode.h"
+#include "EtPluginManager.h"
+#include "EtCamera.h"
+typedef struct EtPlugin Etplugin;
 
 /********* Prototypes for private funtions *********/
 void EiNodePrintNode(const EtNode *node);
@@ -12,25 +15,37 @@ void* EiNodeGetParam(const EtNode *node, const EtChar *name);
  ********* Public Functions ***********
  *************************************/
 EtNode EiNode(const EtChar *name) {
+	EtNode *temp = malloc(sizeof(EtNode));
+	temp->params = NULL;
+	temp->data = NULL;
+	// the default name should be the name of the plugin plus a random hash
+	temp->name 		= name;
+	// get the plugin
 	EtPlugin *plugin = EiGetPlugin(name);
-	//printf("creating instance of %s\n",plugin->name);
-	plugin->mtds->dmethods->init();
+	// if plugin is null then throw an execption and kill the program.
+	plugin->mtds->dmethods->setParams(temp);
+	plugin->mtds->dmethods->init(plugin);
+	// initialize the data
+	int i;
+	for (i=0; i < buf_len(temp->params); i++) {
+		buf_push(temp->data,temp->params[i].def);
+	}
+
+	
+/*	
 	switch (plugin->pluginType) {
 		case EI_PLUGIN_CAMERA : { 
-			EtCameraMethods *cm = (EtCameraMethods *) plugin->mtds->umethods; 
-			cm->createRay();
+			EtCameraData *camd = (EtCameraData*)plugin->data;
+			temp->data 		   = camd;
 			break;
 			}
 	}
-
-	EtNode temp;
-	temp.name 			= name;
-	temp.params 		= NULL;
-	return temp;
+*/
+	return *temp;
 }
 
 void EiNodeAddParam(EtNode *node, const EtParam parm) {
-	buf_push(node->params,parm);
+	//buf_push(node->params,parm);
 }
 
 /*********** Getters ***************/
@@ -44,91 +59,108 @@ int EiNodeGetNumParams(const EtNode *node) {
 // Byte
 EtByte EiNodeGetByte(const EtNode *node,const EtChar *name)
 {
-	EtParam *param = EiNodeGetParam(node,name);
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param) {
-		return param->val.BYTE;
+		return param->BYTE;
 	}
 }
 // Boolean
 EtBoolean EiNodeGetBool(const EtNode *node,const EtChar *name)
 {
-	EtParam *param = EiNodeGetParam(node,name);
+	EtParamValue *param = EiNodeGetParam(node,name);
 	if (param)
-		return param->val.BOOL;
+		return param->BOOL;
 }
 // Int
 EtInt EiNodeGetInt(const EtNode *node,const EtChar *name)
 {
-	EtParam *param = EiNodeGetParam(node,name);
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		return param->val.INT;
+		return param->INT;
 }
 // UInt
 EtUInt EiNodeGetUInt(const EtNode *node,const EtChar *name)
 {
-	EtParam *param = EiNodeGetParam(node,name);
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		return param->val.UINT;
+		return param->UINT;
 }
 // Float
 EtFloat EiNodeGetFlt(const EtNode *node,const EtChar *name)
 {
-	EtParam *param = EiNodeGetParam(node,name);
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		return param->val.FLT;
+		return param->FLT;
 }
-
+// Point
+EtPoint EiNodeGetPnt(const EtNode *node,const EtChar *name)
+{
+	EtParamValue *param = EiNodeGetParam(node, name);
+	if (param)
+		return param->PNT;
+}
 
 /*********** Setters ***************/
 // Byte
 void EiNodeSetByte(EtNode *node,const EtChar *name,const EtByte val) {
-	EtParam *param = EiNodeGetParam(node, name);
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		param->val.BYTE = val;
+		param->BYTE = val;
 }
 // Boolean
 void EiNodeSetBool(EtNode *node,const EtChar *name,const EtBoolean val) {
-	EtParam *param = EiNodeGetParam(node, name);
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		param->val.BOOL = val;
+		param->BOOL = val;
 }
 // Int
-void EiNodeSetInt(EtNode *node,const EtChar *name,const EtInt val) {
-	EtParam *param = EiNodeGetParam(node, name);
+void EiNodeSetInt(EtNode *node,const EtChar *name,const int val) {
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		param->val.INT = val;
+		param->INT = val;
 }
 // UInt
-void EiNodeSetUInt(EtNode *node,const EtChar *name,const EtUInt val) {
-	EtParam *param = EiNodeGetParam(node, name);
+void EiNodeSetUInt(EtNode *node,const EtChar *name,const unsigned val) {
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		param->val.UINT = val;
+		param->UINT = val;
 }
 // Float
-void EiNodeSetFlt(EtNode *node,const EtChar *name,const EtFloat val) {
-	EtParam *param = EiNodeGetParam(node, name);
+void EiNodeSetFlt(EtNode *node,const EtChar *name,const float val) {
+	EtParamValue *param = EiNodeGetParam(node, name);
 	if (param)
-		param->val.FLT = val;
+		param->FLT = val;
 }
+
+// Point
+void EiNodeSetPnt(EtNode *node,const EtChar *name,
+						const double x,
+						const double y,
+						const double z) {
+	EtParamValue *param = EiNodeGetParam(node, name);
+	if (param) {param->PNT.x=x;param->PNT.y=y;param->PNT.z=z;}
+}
+
 
 /*************************************
  ********* Private Functions *********
  *************************************/
 void* EiNodeGetParam(const EtNode *node, const EtChar *name) {
 	EtParam *params = node->params;
-	EtInt i = 0;
-	
+	int i = 0;
+	int j = 0;	
 	for (i ; i < buf_len(params); i++) {
 		if (strcmp(params[i].name,name) == 0) {
-			//printf("FOUND %s\n",name);
-			return &params[i];
+			return (EtParamValue*)&node->data[i];
+		} else {
+			j += EiGetParamSize(params[i]);
 		}
 	}
-	//printf("NOT FOUND %s\n",name);
 	return NULL;
 }
 
 /********** Debugging *****************/
+/*
 void EiNodePrintNode(const EtNode *node)
 {
 	printf("###############\n");
@@ -141,22 +173,24 @@ void EiNodePrintNode(const EtNode *node)
 void EiNodePrintParams(const EtNode *node) {
 	int i = 0;
 	for (i; i < buf_len(node->params);i++) {
+		EtParam	*data = (EtParam*)params[i].d;
 		printf("---------------------------\n");
-		printf("\tName   = %s\n",node->params[i].name);
-		printf("\tType   = %i\n",node->params[i].type);
+		printf("\tName   = %s\n",node->params[i].d->name);
+		printf("\tType   = %i\n",node->params[i].d->type);
 		switch (node->params[i].type) {
 			case EI_TYPE_BOOLEAN:
 				printf("\tDefault= %i\n",node->params[i].def.BOOL);
-				printf("\tValue  = %i\n",node->params[i].val.BOOL);
+				//printf("\tValue  = %i\n",node->params[i].val.BOOL);
 				break;
 			case EI_TYPE_INT:
 				printf("\tDefault= %d\n",node->params[i].def.INT);
-				printf("\tValue  = %d\n",node->params[i].val.INT);
+				//printf("\tValue  = %d\n",node->params[i].val.INT);
 				break;
 			case EI_TYPE_FLOAT:
 				printf("\tDefault= %f\n",node->params[i].def.FLT);
-				printf("\tValue  = %f\n",node->params[i].val.FLT);
+				//printf("\tValue  = %f\n",node->params[i].val.FLT);
 				break;
 		}
 	}
 }
+*/

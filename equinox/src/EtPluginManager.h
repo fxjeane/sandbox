@@ -6,10 +6,15 @@
 #include <strings.h>
 #include "buf.h"
 #include "EtTypes.h"
+#include "EtParam.h"
 #include "EtApi.h"
+#include "EtNode.h"
+
+typedef struct EtPlugin EtPlugin;
 
 struct EtNodeDefaultMtds {
-	 void (* init)(void);
+	 void (*init)(EtPlugin *pl);
+	 void (*setParams)(EtNode *node);
 };
 typedef struct EtNodeDefaultMtds EtNodeDefaultMtds;
 
@@ -20,12 +25,12 @@ struct EtNodeMtds {
 typedef struct EtNodeMtds EtNodeMtds;
 
 struct EtPlugin {
-	char 		*name;
-	unsigned int pluginType;
-	unsigned int returnType;
-	EtNodeMtds	*mtds;
+	char 			*name;
+	unsigned int 	pluginType;
+	unsigned int 	returnType;
+	EtNodeMtds		*mtds;
+	void			*data;
 };
-typedef struct EtPlugin EtPlugin;
 
 /* The plugin registry keeps the  plugins that have been registered */
 struct EtPluginRegistry {
@@ -33,9 +38,9 @@ struct EtPluginRegistry {
 	EtPlugin		*plugins;
 } EtPluginRegistry;
 
-
 #define plugin_loader bool load(int i, EtPlugin *plugin)
-#define plugin_init void init(void)
+#define plugin_init void init(EtPlugin *plugin)
+#define plugin_params void setParams(EtNode *node)
 
 ET_API int EiLoadPlugin(const char *lib);
 ET_API int EiLoadPlugins(const char *dir);

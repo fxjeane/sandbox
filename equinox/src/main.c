@@ -3,45 +3,34 @@
 #include "exr.h"
 
 int main() {
-	//EiLoadPlugins("plugin");
-	//EtNode cam = EiNode("ortho_camera");
+	EiLoadPlugins("plugin");
+	EtNode cam = EiNode("ortho_camera");
+	
+	EtPoint foo = EiNodeGetPnt(&cam,"position");
+	printf("pos = %f %f %f\n",foo.x,foo.y,foo.z);
+	foo = EiNodeGetPnt(&cam,"lookAt");
+	printf("dir = %f %f %f\n",foo.x,foo.y,foo.z);
+	EiNodeSetPnt(&cam,"lookAt",0.5,0.1,0.0);
+	foo = EiNodeGetPnt(&cam,"lookAt");
+	printf("dir = %f %f %f\n",foo.x,foo.y,foo.z);
 	
 	int xres, yres;
 	int r,c;
-	xres = 800;
-	yres = 400;
-	int i,j;
+	xres = 640;
+	yres = 480;
+	int i;
 
-	Rgba px[xres][yres];
-
-/*	// Why wont this work
-	Rgba **px;
-	px = (Rgba**)malloc(sizeof(Rgba*) * (xres));
-	for (i = 0; i < xres; ++i) {
-		px[i] = (Rgba*)malloc(sizeof(Rgba) * (yres));
-	} */
+	Rgba *px = (Rgba*)malloc(sizeof(Rgba) * xres * yres);
 
 	EtBucketWorker *bucketw = (EtBucketWorker*)malloc(sizeof(EtBucketWorker));
 	EiCalculateBuckets(bucketw,xres,yres,32);
-
+	int j = 0;
 	for (i=0;i< bucketw->num;i++) {
 		EtBucket thisb = bucketw->buckets[i];
-		//printf("GET Bucket %i pos = %i %i, w = %i, h = %i\n",j++,
-		//		thisb.pos.x,thisb.pos.y,thisb.width,thisb.height);
-		for (int y = thisb.pos.y; y < thisb.pos.y + thisb.height; y++)
-		{
-			for (int x = thisb.pos.x; x < thisb.pos.x + thisb.width; x++)
-			{
-				Rgba *p = &px[x][y];
-				p->r = 0;
-				p->g = 1;
-				p->b = 0;
-				p->a = 1;
-			}
-		}
+		EiProcessBucket(thisb,px,j);
 	}
 
-	writeRgbaImage("test.exr",*px,xres, yres);
+	writeRgbaImage("test.exr",px,xres, yres);
 	return 0;
 }
 
